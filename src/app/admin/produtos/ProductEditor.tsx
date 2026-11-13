@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useState, useTransition } from "react";
+import { createClient } from "@/lib/supabase/client";
 import { ArrowDown, ArrowUp, Trash2 } from "lucide-react";
 import type { Category, InventoryRow, ProductImage, ProductVariant, ProductWithRelations } from "@/lib/types";
 import { slugify } from "@/lib/format";
@@ -33,7 +34,7 @@ export function ProductEditor({ product, categories }: { product?: ProductWithRe
 
   return (
     <div className="grid gap-6 xl:grid-cols-[1fr_380px]">
-      <form action={action} className="space-y-6">
+      <form id="product-form" action={action} className="space-y-6">
         {product && <input type="hidden" name="id" value={product.id} />}
         <FormMessage state={state?.error ? state : undefined} />
 
@@ -154,10 +155,56 @@ export function ProductEditor({ product, categories }: { product?: ProductWithRe
             <VariantsPanel productId={product.id} variants={product.variants} inventory={product.inventory} />
           </>
         ) : (
-          <Panel title="Imagens e variações"><p className="text-sm text-ink-muted">Salve o produto para enviar imagens e cadastrar variações.</p></Panel>
+          <>
+            <PendingImagesPanel />
+            <Panel title="Variações (cor, tamanho...)">
+              <p className="text-sm text-ink-muted">As variações podem ser cadastradas logo depois de criar o produto.</p>
+            </Panel>
+          </>
         )}
       </div>
     </div>
+  );
+}
+
+/** Imagens do produto novo: enviadas já agora e vinculadas ao clicar em "Criar produto". */
+function PendingImagesPanel() {
+  const [folder] = useState(() => `novos/${crypto.randomUUID()}`);
+  const [images, setImages] = useState<{ url: string; path: string }[]>([]);
+  const move = (i: number, dir: -1 | 1) => {
+    const j = i + dir;
+    if (j < 0 || j >= images.length) return;
+    const next = [...images];
+    [next[i], next[j]] = [next[j], next[i]];
+    setImages(next);
+  };
+  const remove = async (i: number) => {
+    const img = images[i];
+    setImages(images.filter((_, k) => k !== i));
+    await createClient().storage.from("products").remove([img.path]).catch(() => undefined);
+  };
+  return (
+    <Panel title="Imagens">
+      {/* vai junto com o formulário principal */}
+      <input type="hidden" name="pending_images" form="product-form" value={JSON.stringify(images)} />
+      {images.length > 0 && (
+        <div className="mb-4 grid grid-cols-3 gap-3">
+          {images.map((img, i) => (
+            <div key={img.path} className="group relative aspect-[4/5] overflow-hidden rounded-xl bg-cream">
+              <Image src={img.url} alt="" fill sizes="120px" className="object-cover" />
+              {i === 0 && <span className="absolute left-1.5 top-1.5 rounded-full bg-ink px-2 py-0.5 text-[9px] font-bold text-white">CAPA</span>}
+              <div className="absolute inset-x-0 bottom-0 flex justify-between bg-ink/70 p-1">
+                <button type="button" onClick={() => move(i, -1)} className="p-1 text-white" aria-label="Mover para a esquerda"><ArrowUp className="h-3.5 w-3.5 -rotate-90" /></button>
+                <button type="button" onClick={() => remove(i)} className="p-1 text-red-300" aria-label="Remover imagem"><Trash2 className="h-3.5 w-3.5" /></button>
+                <button type="button" onClick={() => move(i, 1)} className="p-1 text-white" aria-label="Mover para a direita"><ArrowDown className="h-3.5 w-3.5 -rotate-90" /></button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+      <UploadButton bucket="products" folder={folder} multiple label={images.length ? "Enviar mais imagens" : "Enviar imagens"} onUploaded={(r) => setImages((cur) => [...cur, r])} />
+      <p className="mt-2 text-[11px] text-ink-muted">Recomendado: 1200×1500 px (4:5), JPG ou WEBP. A primeira imagem é a capa. As imagens são salvas junto com o produto ao clicar em “Criar produto”.</p>
+    </Panel>
   );
 }
 

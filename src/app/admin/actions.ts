@@ -104,6 +104,25 @@ export async function saveProduct(_: ActionResult, fd: FormData): Promise<Action
       const { data, error } = await supabase.from("products").insert(parsed.data).select("id").single();
       if (error) throw error;
       productId = data.id;
+
+      // Imagens enviadas durante o cadastro (antes de o produto existir)
+      const pending = (() => {
+        try {
+          return JSON.parse(String(fd.get("pending_images") ?? "[]")) as { url: string; path: string }[];
+        } catch {
+          return [];
+        }
+      })();
+      const base = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/products/`;
+      const valid = pending
+        .filter((i) => typeof i?.url === "string" && typeof i?.path === "string" && i.path.startsWith("novos/") && i.url === base + i.path)
+        .slice(0, 20);
+      if (valid.length) {
+        const { error: imgErr } = await supabase
+          .from("product_images")
+          .insert(valid.map((i, position) => ({ product_id: productId, url: i.url, storage_path: i.path, alt: parsed.data.name, position })));
+        if (imgErr) throw imgErr;
+      }
     }
 
     // Estoque do produto simples
