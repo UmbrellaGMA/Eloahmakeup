@@ -1,26 +1,156 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* =============================================================================
+   Eloah Make Up — Design tokens
+   Lilás (destaque) · Preto (contraste) · Branco/tons claros (equilíbrio)
+   ============================================================================= */
+@theme {
+  --color-lilac-50: #f8f5fd;
+  --color-lilac-100: #f0e9fb;
+  --color-lilac-200: #e2d3f7;
+  --color-lilac-300: #cdb3ef;
+  --color-lilac-400: #b691e4;
+  --color-lilac-500: #9d70d5;
+  --color-lilac-600: #8656bf;
+  --color-lilac-700: #6e449f;
+  --color-lilac-800: #573880;
+  --color-lilac-900: #3d2858;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-ink: #0f0c13;
+  --color-ink-soft: #1c1823;
+  --color-ink-muted: #5e5866;
+  --color-line: #ece8f0;
+  --color-cream: #fbfaf8;
+  --color-blush: #f6eef0;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  --color-success: #2f7d5b;
+  --color-warning: #b7791f;
+  --color-danger: #c0392b;
+
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-cormorant), ui-serif, Georgia, serif;
+
+  --radius-card: 1.25rem;
+  --shadow-soft: 0 10px 30px -12px rgb(61 40 88 / 0.18);
+  --shadow-lift: 0 22px 45px -20px rgb(61 40 88 / 0.35);
+
+  --animate-fade-up: fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-fade-in: fade-in 0.4s ease both;
+  --animate-slide-in-right: slide-in-right 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-slide-in-left: slide-in-left 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-marquee: marquee 28s linear infinite;
+  --animate-shimmer: shimmer 1.6s linear infinite;
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes slide-in-right {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+  }
+  @keyframes slide-in-left {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(0); }
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  @keyframes shimmer {
+    from { background-position: -400px 0; }
+    to { background-position: 400px 0; }
   }
 }
 
+:root {
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: #ffffff;
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--color-lilac-200);
+  color: var(--color-ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-lilac-500);
+  outline-offset: 2px;
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-[1320px] px-4 sm:px-6 lg:px-10;
+  }
+  .eyebrow {
+    @apply text-[11px] font-semibold uppercase tracking-[0.28em] text-lilac-700;
+  }
+  .heading-display {
+    @apply font-display font-medium tracking-tight text-ink;
+  }
+  .field {
+    @apply block w-full rounded-xl border border-line bg-white px-4 py-3 text-sm text-ink placeholder:text-ink-muted/60
+      transition focus:border-lilac-400 focus:outline-none focus:ring-4 focus:ring-lilac-100 disabled:bg-cream disabled:text-ink-muted;
+  }
+  .label {
+    @apply mb-1.5 block text-xs font-semibold uppercase tracking-wider text-ink-muted;
+  }
+  .card {
+    @apply rounded-[var(--radius-card)] border border-line bg-white;
+  }
+  .skeleton {
+    @apply animate-shimmer rounded-lg bg-[linear-gradient(90deg,#f3eff7_0%,#faf8fc_50%,#f3eff7_100%)] bg-[length:800px_100%];
+  }
+  .link-underline {
+    @apply relative after:absolute after:-bottom-0.5 after:left-0 after:h-px after:w-full after:origin-right after:scale-x-0 after:bg-current after:transition-transform after:duration-300 hover:after:origin-left hover:after:scale-x-100;
+  }
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+.prose-eloah p {
+  margin-bottom: 0.9em;
+  line-height: 1.75;
+}
+.prose-eloah ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+  margin-bottom: 0.9em;
+}
+.prose-eloah h2,
+.prose-eloah h3 {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  margin: 1.2em 0 0.4em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
