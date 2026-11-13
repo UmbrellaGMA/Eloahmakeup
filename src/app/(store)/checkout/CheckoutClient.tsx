@@ -394,7 +394,7 @@ export function CheckoutClient({
           <div className="grid gap-3 sm:grid-cols-2">
             {[
               { id: "pix" as const, title: "Pix", text: "Aprovação imediata. QR Code gerado após confirmar.", Icon: PixIcon },
-              { id: "credit_card" as const, title: "Cartão de crédito", text: `Em até ${inst.count}x de ${formatPrice(inst.value)}`, Icon: CreditCard },
+              { id: "credit_card" as const, title: "Cartão de crédito", text: inst.count > 1 ? `Em até ${inst.count}x — as parcelas aparecem ao digitar o cartão` : "Pagamento à vista", Icon: CreditCard },
             ].map(({ id, title, text, Icon }) => (
               <button
                 key={id}
@@ -477,7 +477,7 @@ export function CheckoutClient({
           {cart.discount > 0 && <div className="flex justify-between text-success"><dt>Desconto ({cart.coupon?.code})</dt><dd>-{formatPrice(cart.discount)}</dd></div>}
           <div className="flex justify-between"><dt className="text-ink-muted">Frete</dt><dd>{shipping ? (shipping.price === 0 ? "Grátis" : formatPrice(shipping.price)) : "—"}</dd></div>
           <div className="flex justify-between border-t border-line pt-3 text-base font-bold"><dt>Total</dt><dd>{formatPrice(total)}</dd></div>
-          {method === "credit_card" && inst.count > 1 && <p className="text-right text-xs text-ink-muted">ou {inst.count}x de {formatPrice(inst.value)}</p>}
+          {method === "credit_card" && inst.count > 1 && <p className="text-right text-xs text-ink-muted">Parcele em até {inst.count}x no cartão</p>}
         </dl>
       </aside>
     </div>

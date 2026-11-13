@@ -27,7 +27,7 @@ export function PriceTag({
       </div>
       {showInstallments && inst.count > 1 && (
         <span className="text-xs text-ink-muted">
-          ou {inst.count}x de <strong className="font-semibold text-ink">{formatPrice(inst.value)}</strong> no cartão
+          ou em até <strong className="font-semibold text-ink">{inst.count}x</strong> no cartão
         </span>
       )}
     </div>

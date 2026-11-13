@@ -183,10 +183,33 @@ export function PaymentClient({
           {!publicEnv.mercadoPagoPublicKey ? (
             <p className="rounded-xl bg-amber-50 p-4 text-sm text-amber-900">Pagamento com cartão em configuração.</p>
           ) : (
+            <>
+            {maxInstallments > 1 && (
+              <p className="mb-4 rounded-xl bg-lilac-50 px-4 py-3 text-sm text-lilac-900">
+                Parcele em até <strong>{maxInstallments}x</strong>. Digite o número do cartão e as opções de parcelamento aparecem logo abaixo, com o valor de cada parcela.
+              </p>
+            )}
             <CardPayment
               locale="pt-BR"
               initialization={{ amount: total, payer: { email } }}
-              customization={{ paymentMethods: { maxInstallments, types: { included: ["credit_card"] } } }}
+              customization={{
+                paymentMethods: { minInstallments: 1, maxInstallments, types: { included: ["credit_card"] } },
+                visual: {
+                  texts: { formTitle: "Cartão de crédito", formSubmit: "Pagar" },
+                  style: {
+                    customVariables: {
+                      baseColor: "#0f0c13",
+                      baseColorFirstVariant: "#2a2331",
+                      baseColorSecondVariant: "#3d2858",
+                      buttonTextColor: "#ffffff",
+                      outlinePrimaryColor: "#a47dab",
+                      borderRadiusMedium: "12px",
+                      borderRadiusLarge: "999px",
+                      fontWeightSemiBold: "600",
+                    },
+                  },
+                },
+              }}
               onSubmit={async (form) => {
                 setError(null);
                 const res = await fetch("/api/payments/card", {
@@ -215,6 +238,7 @@ export function PaymentClient({
               }}
               onError={() => setError("Erro ao carregar o formulário de cartão. Recarregue a página.")}
             />
+            </>
           )}
           <p className="mt-3 text-center text-xs text-ink-muted">Total: {formatPrice(total)} · Os dados do cartão são enviados diretamente ao Mercado Pago.</p>
         </div>
