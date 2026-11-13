@@ -38,7 +38,19 @@ const nextConfig: NextConfig = {
     ],
   },
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
+    return [
+      { source: "/:path*", headers: securityHeaders },
+      {
+        // Service worker do app do painel: sempre a versão mais recente
+        source: "/sw.js",
+        headers: [
+          { key: "Content-Type", value: "application/javascript; charset=utf-8" },
+          { key: "Cache-Control", value: "no-cache, no-store, must-revalidate" },
+          { key: "Content-Security-Policy", value: "default-src 'self'; script-src 'self'" },
+        ],
+      },
+      { source: "/admin.webmanifest", headers: [{ key: "Content-Type", value: "application/manifest+json" }] },
+    ];
   },
   async redirects() {
     // Endereço único para SEO: www e o endereço provisório da Vercel → eloahmakeup.com

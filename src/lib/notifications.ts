@@ -5,6 +5,7 @@ import { publicEnv } from "@/lib/env";
 import { getStoreSettings } from "@/lib/catalog";
 import { logIntegration } from "@/lib/logger";
 import { renderEmail, type EmailKind } from "@/lib/email/templates";
+import { notifyAdminsPush } from "@/lib/push";
 import type { Order, OrderItem } from "@/lib/types";
 
 const MAX_ATTEMPTS = 3;
@@ -38,6 +39,8 @@ async function sendViaResend(to: string, subject: string, html: string, text: st
  * e não interrompem pagamento, webhook ou emissão de etiqueta.
  */
 export async function notifyOrder(orderId: string, kind: EmailKind) {
+  // Aviso no app do painel (push), independente do e-mail
+  await notifyAdminsPush(orderId, kind);
   if (!integrations.email || !integrations.supabaseAdmin) return;
   try {
     const db = createAdminClient();

@@ -14,6 +14,9 @@ export const serverEnv = {
   emailFrom: process.env.EMAIL_FROM ?? "Eloah Make Up <pedidos@eloahmakeup.com>",
   emailReplyTo: process.env.EMAIL_REPLY_TO ?? "",
   storeNotifyEmail: process.env.STORE_NOTIFY_EMAIL ?? "",
+  vapidPublicKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? "",
+  vapidPrivateKey: process.env.VAPID_PRIVATE_KEY ?? "",
+  vapidSubject: process.env.VAPID_SUBJECT ?? "https://eloahmakeup.com",
 };
 
 export const integrations = {
@@ -28,5 +31,8 @@ export const integrations = {
   },
   get email() {
     return Boolean(serverEnv.resendApiKey);
+  },
+  get push() {
+    return Boolean(serverEnv.vapidPublicKey && serverEnv.vapidPrivateKey);
   },
 };

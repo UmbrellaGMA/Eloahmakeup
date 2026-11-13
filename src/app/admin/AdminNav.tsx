@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { BadgePercent, Boxes, ExternalLink, FolderTree, Image as ImageIcon, LayoutDashboard, Menu, Package, PlugZap, Settings, ShoppingCart, Users, X } from "lucide-react";
+import { BadgePercent, Boxes, ExternalLink, FolderTree, Image as ImageIcon, LayoutDashboard, Menu, Package, PlugZap, Settings, ShoppingCart, Smartphone, Users, X } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
 
 const LINKS = [
@@ -17,6 +17,7 @@ const LINKS = [
   { href: "/admin/banners", label: "Banners", Icon: ImageIcon },
   { href: "/admin/configuracoes", label: "Configurações", Icon: Settings },
   { href: "/admin/integracoes", label: "Integrações", Icon: PlugZap },
+  { href: "/admin/app", label: "App no celular", Icon: Smartphone },
 ];
 
 export function AdminNav({ email, role }: { email: string; role: string }) {
