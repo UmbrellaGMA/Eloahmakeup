@@ -5,6 +5,7 @@ import { Newsletter } from "@/components/store/Newsletter";
 import { ButtonLink } from "@/components/ui/Button";
 import { getActiveBanners, getCategories, getStoreSettings, listProducts } from "@/lib/catalog";
 import { publicEnv } from "@/lib/env";
+import { jsonLd as toJsonLd } from "@/lib/safe";
 
 export const revalidate = 120;
 
@@ -33,7 +34,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: toJsonLd(orgJsonLd) }} />
       <HeroCarousel banners={banners} />
       <Benefits settings={settings} />
 

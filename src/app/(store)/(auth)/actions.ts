@@ -6,12 +6,12 @@ import { createClient } from "@/lib/supabase/server";
 import { mergeGuestCart } from "@/lib/cart";
 import { publicEnv, isSupabaseConfigured } from "@/lib/env";
 import { onlyDigits } from "@/lib/format";
+import { safeNextPath } from "@/lib/safe";
 
 export type AuthState = { error?: string; success?: string } | undefined;
 
 function safeNext(v: FormDataEntryValue | null) {
-  const s = typeof v === "string" ? v : "";
-  return s.startsWith("/") && !s.startsWith("//") ? s : "/conta";
+  return safeNextPath(v);
 }
 
 function translate(message: string) {

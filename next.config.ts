@@ -34,7 +34,6 @@ const nextConfig: NextConfig = {
     qualities: [75, 90],
     remotePatterns: [
       ...(supabaseHost ? [{ protocol: "https" as const, hostname: supabaseHost, pathname: "/storage/v1/object/public/**" }] : []),
-      { protocol: "https", hostname: "*.supabase.co", pathname: "/storage/v1/object/public/**" },
     ],
   },
   async headers() {

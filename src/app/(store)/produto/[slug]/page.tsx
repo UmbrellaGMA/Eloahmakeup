@@ -6,6 +6,7 @@ import { ProductRail } from "@/components/store/ProductRail";
 import { getCategories, getProductBySlug, getRelatedProducts } from "@/lib/catalog";
 import { effectivePrice } from "@/lib/format";
 import { publicEnv } from "@/lib/env";
+import { jsonLd as toJsonLd } from "@/lib/safe";
 
 export const revalidate = 120;
 
@@ -61,7 +62,7 @@ export default async function ProductPage({ params }: PageProps<"/produto/[slug]
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: toJsonLd(jsonLd) }} />
       <div className="container-page pb-10 pt-6">
         <Breadcrumbs
           items={[

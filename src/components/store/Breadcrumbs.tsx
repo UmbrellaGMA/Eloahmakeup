@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { publicEnv } from "@/lib/env";
+import { jsonLd as toJsonLd } from "@/lib/safe";
 
 export function Breadcrumbs({ items }: { items: { label: string; href?: string }[] }) {
   const jsonLd = {
@@ -15,7 +16,7 @@ export function Breadcrumbs({ items }: { items: { label: string; href?: string }
   };
   return (
     <nav aria-label="Trilha de navegação">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: toJsonLd(jsonLd) }} />
       <ol className="flex flex-wrap items-center gap-1.5 text-xs text-ink-muted">
         {items.map((it, i) => (
           <li key={i} className="flex items-center gap-1.5">

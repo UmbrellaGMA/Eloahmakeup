@@ -2,11 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import type { EmailOtpType } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { mergeGuestCart } from "@/lib/cart";
+import { safeNextPath } from "@/lib/safe";
 
 export const dynamic = "force-dynamic";
 
 function safeNext(next: string | null) {
-  return next && next.startsWith("/") && !next.startsWith("//") ? next : "/conta";
+  return safeNextPath(next);
 }
 
 /**
