@@ -47,7 +47,7 @@ export function ProductRail({
       </div>
       <div ref={ref} className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 sm:-mx-6 sm:gap-6 sm:px-6 lg:mx-0 lg:px-0">
         {products.map((p, i) => (
-          <div key={p.id} className="w-[46%] shrink-0 snap-start sm:w-[31%] lg:w-[calc(25%-18px)]">
+          <div key={p.id} className="flex w-[46%] shrink-0 snap-start sm:w-[31%] lg:w-[calc(25%-18px)]">
             <ProductCard product={p} priority={i < 2} />
           </div>
         ))}

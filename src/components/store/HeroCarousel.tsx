@@ -8,12 +8,15 @@ import type { Banner } from "@/lib/types";
 import { Logo } from "@/components/brand/Logo";
 import { buttonClass } from "@/components/ui/Button";
 
+/** Mesmas proporções dos banners: celular 1080×880 · computador 1920×440. */
+const HERO_BOX = "relative w-full aspect-[27/22] md:aspect-[48/11]";
+
 /** Exibido enquanto não há banners cadastrados no painel: fundo liso com a logo. */
 function BrandHero() {
   return (
-    <section className="bg-ink">
-      <div className="container-page flex min-h-[360px] flex-col items-center justify-center gap-8 py-16 text-center sm:min-h-[440px]">
-        <Logo tone="light" size="lg" priority className="!h-24 sm:!h-32" />
+    <section className={`${HERO_BOX} bg-ink`}>
+      <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 px-4 text-center md:gap-8">
+        <Logo tone="light" size="lg" priority className="!h-24 md:!h-28 lg:!h-32" />
         <Link href="/produtos" className={buttonClass("light", "lg")}>
           Ver produtos <ArrowRight className="h-4 w-4" />
         </Link>
@@ -25,7 +28,8 @@ function BrandHero() {
 /**
  * Carrossel de banners: somente a imagem enviada no painel, sem texto
  * sobreposto e sem degradê. O banner inteiro é clicável quando tem link.
- * Proporções: desktop 1920×800 (12:5) · mobile 900×1200 (3:4).
+ * Tamanhos: computador 1920×440 px · celular 1080×880 px (sem imagem de
+ * celular, a de computador é recortada pelo centro).
  */
 export function HeroCarousel({ banners }: { banners: Banner[] }) {
   const slides = banners.filter((b) => b.image_url || b.mobile_image_url);
@@ -33,7 +37,6 @@ export function HeroCarousel({ banners }: { banners: Banner[] }) {
   const [paused, setPaused] = useState(false);
   const total = slides.length;
   const go = useCallback((dir: number) => setIndex((i) => (i + dir + total) % total), [total]);
-  const hasMobile = slides.some((b) => b.mobile_image_url);
 
   useEffect(() => {
     if (total < 2 || paused) return;
@@ -51,15 +54,15 @@ export function HeroCarousel({ banners }: { banners: Banner[] }) {
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      <div className={`relative w-full ${hasMobile ? "aspect-[3/4]" : "aspect-[12/5]"} sm:aspect-[12/5]`}>
+      <div className={HERO_BOX}>
         {slides.map((b, i) => {
           const active = i === index;
           const desktop = b.image_url ?? b.mobile_image_url!;
           const mobile = b.mobile_image_url ?? b.image_url!;
           const content = (
             <>
-              <Image src={desktop} alt={b.title} fill priority={i === 0} sizes="100vw" className="hidden object-cover sm:block" />
-              <Image src={mobile} alt={b.title} fill priority={i === 0} sizes="100vw" className="object-cover sm:hidden" />
+              <Image src={desktop} alt={b.title} fill priority={i === 0} sizes="100vw" className="hidden object-cover md:block" />
+              <Image src={mobile} alt={b.title} fill priority={i === 0} sizes="100vw" className="object-cover md:hidden" />
             </>
           );
           return (

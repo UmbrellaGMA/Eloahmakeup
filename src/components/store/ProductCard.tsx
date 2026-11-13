@@ -18,7 +18,7 @@ export function ProductCard({ product, priority }: { product: ProductCardData; p
   const href = `/produto/${product.slug}`;
 
   return (
-    <article className="group relative flex flex-col">
+    <article className="group relative flex h-full w-full flex-col">
       <Link href={href} className="relative block aspect-[4/5] overflow-hidden rounded-[var(--radius-card)] bg-cream">
         <ProductImage
           src={product.image}
@@ -54,7 +54,8 @@ export function ProductCard({ product, priority }: { product: ProductCardData; p
         <div className="mt-2">
           <PriceTag price={product.price} promoPrice={product.promo_price} size="sm" />
         </div>
-        <div className="mt-3">
+        {/* botão sempre no rodapé do card, alinhado com os vizinhos */}
+        <div className="mt-auto pt-3">
           {!product.in_stock ? (
             <Link href={href} className="flex h-10 w-full items-center justify-center rounded-full border border-line text-xs font-semibold text-ink-muted">
               Ver produto

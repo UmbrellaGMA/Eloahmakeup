@@ -85,21 +85,21 @@ export function Header({ nav, announcement }: { nav: NavItem[]; announcement: st
       )}
 
       <header className={`sticky top-0 z-50 border-b bg-white/95 backdrop-blur transition-shadow ${scrolled ? "border-line shadow-[0_8px_24px_-18px_rgba(15,12,19,0.35)]" : "border-transparent"}`}>
-        <div className="container-page flex h-[72px] items-center gap-4 lg:h-[84px]">
+        <div className="container-page relative flex h-[72px] items-center gap-4 lg:h-[84px]">
           <button className="-ml-2 flex h-10 w-10 items-center justify-center lg:hidden" aria-label="Abrir menu" onClick={() => setMenuOpen(true)}>
             <Menu className="h-6 w-6" strokeWidth={1.6} />
           </button>
 
-          <Link href="/" aria-label="Eloah Make Up — página inicial" className="mx-auto shrink-0 lg:mx-0">
-            <span className="lg:hidden"><Logo size="sm" /></span>
-            <span className="hidden lg:block"><Logo /></span>
+          {/* No celular a logo fica no centro exato da tela, independente dos ícones laterais */}
+          <Link href="/" aria-label="Eloah Make Up — página inicial" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 lg:static lg:translate-x-0 lg:translate-y-0 lg:shrink-0">
+            <Logo size="md" priority className="!h-10 lg:!h-12" />
           </Link>
 
           <div className="mx-8 hidden max-w-xl flex-1 lg:block">
             <SearchForm />
           </div>
 
-          <div className="flex items-center gap-0.5 sm:gap-1 lg:ml-auto">
+          <div className="ml-auto flex items-center gap-0.5 sm:gap-1">
             <button className="flex h-10 w-10 items-center justify-center lg:hidden" aria-label="Buscar" onClick={() => setSearchOpen((v) => !v)}>
               <Search className="h-[21px] w-[21px]" strokeWidth={1.6} />
             </button>
@@ -134,7 +134,7 @@ export function Header({ nav, announcement }: { nav: NavItem[]; announcement: st
         <nav className="hidden border-t border-line lg:block" aria-label="Categorias">
           <ul className="container-page flex h-12 items-center justify-center gap-10">
             <li>
-              <Link href="/" className={`link-underline text-[13px] font-semibold uppercase tracking-[0.14em] ${pathname === "/" ? "text-lilac-700" : ""}`}>
+              <Link href="/" className={`link-underline flex items-center gap-1 text-[13px] font-semibold uppercase tracking-[0.14em] ${pathname === "/" ? "text-lilac-700" : ""}`}>
                 Início
               </Link>
             </li>

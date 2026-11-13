@@ -16,12 +16,12 @@ export function Benefits({ settings }: { settings: StoreSettings }) {
     <section className="border-b border-line bg-white">
       <div className="container-page grid grid-cols-2 gap-y-6 py-8 lg:grid-cols-4">
         {items.map(({ Icon, title, text }) => (
-          <div key={title} className="flex items-start gap-3 px-2 sm:items-center sm:px-4">
+          <div key={title} className="flex items-start gap-3 px-2 sm:px-4">
             <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-lilac-50 text-lilac-700">
               <Icon className="h-5 w-5" />
             </span>
             <div>
-              <p className="text-[13px] font-semibold leading-tight">{title}</p>
+              <p className="pt-0.5 text-[13px] font-semibold leading-tight">{title}</p>
               <p className="mt-0.5 text-xs text-ink-muted">{text}</p>
             </div>
           </div>
