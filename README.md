@@ -104,12 +104,12 @@ Avisos enviados uma única vez por pedido/tipo (tabela `notifications`): pedido 
 
 ## 7. Rotinas agendadas
 
-`vercel.json` agenda (com `Authorization: Bearer CRON_SECRET`):
+`vercel.json` agenda uma execução diária de cada rotina (limite do plano gratuito da Vercel):
 
-- `/api/cron/expire-orders` a cada 15 min — reconcilia e cancela pedidos não pagos após 60 min, devolvendo o estoque.
-- `/api/cron/sync-tracking` a cada hora — atualiza rastreamentos.
+- `/api/cron/expire-orders` — reconcilia e cancela pedidos não pagos após 60 min, devolvendo o estoque.
+- `/api/cron/sync-tracking` — atualiza rastreamentos.
 
-No plano Hobby da Vercel os crons rodam no máximo 1×/dia; use o plano Pro ou um agendador externo chamando as mesmas URLs.
+Para rodar com mais frequência no plano gratuito, use um agendador externo (ex.: cron-job.org) chamando `https://SEU-DOMINIO/api/cron/expire-orders` a cada 15 min e `/api/cron/sync-tracking` a cada hora, com o cabeçalho `Authorization: Bearer CRON_SECRET`. No plano Pro, basta trocar os horários no `vercel.json`.
 
 ## 8. Estrutura
 
