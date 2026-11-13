@@ -264,7 +264,12 @@ export async function refreshShipment(shipmentId: string) {
     }
   }
   // Avisos ao cliente (deduplicados por pedido/tipo)
-  if (mapped === "posted" || mapped === "delivered") await notifyOrder(s.order_id, "shipped");
+  // O código de rastreio é enviado assim que a etiqueta é emitida (ou, se a
+  // SuperFrete ainda não o tiver gerado, na postagem). Um único e-mail por pedido.
+  const trackingCode = (update.tracking_code as string | null) ?? null;
+  if ((mapped === "released" && trackingCode) || mapped === "posted" || mapped === "delivered") {
+    await notifyOrder(s.order_id, "shipped");
+  }
   if (mapped === "delivered") await notifyOrder(s.order_id, "delivered");
   const { data: fresh } = await db.from("shipments").select("*").eq("id", shipmentId).single();
   return fresh;

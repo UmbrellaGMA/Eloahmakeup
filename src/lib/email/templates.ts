@@ -172,13 +172,14 @@ export function renderEmail(kind: EmailKind, ctx: EmailContext): { subject: stri
     case "shipped": {
       const t = ctx.tracking;
       return {
-        subject: `Seu pedido ${n} foi enviado! 📦`,
+        subject: t?.code ? `Seu pedido ${n} já tem código de rastreio 📦` : `Seu pedido ${n} foi enviado! 📦`,
         text: `Olá, ${o.customer_name}! O pedido ${n} foi postado${t?.service ? ` via ${t.service}` : ""}.${t?.code ? ` Código de rastreio: ${t.code}.` : ""} ${t?.url ?? orderUrl}`,
         html: layout(
           ctx,
           `Pedido ${n} postado${t?.code ? ` — rastreio ${t.code}` : ""}.`,
           h1("Seu pedido está a caminho! 📦") +
-            p(`${first}, o pedido <strong style="color:${C.ink}">${n}</strong> foi postado${t?.service ? ` via <strong style="color:${C.ink}">${esc(t.service)}</strong>` : ""}.${o.shipping_days ? ` O prazo estimado é de até ${o.shipping_days} dias úteis.` : ""}`) +
+            p(`${first}, o pedido <strong style="color:${C.ink}">${n}</strong> foi embalado e despachado${t?.service ? ` via <strong style="color:${C.ink}">${esc(t.service)}</strong>` : ""}.${o.shipping_days ? ` O prazo estimado é de até ${o.shipping_days} dias úteis após a postagem.` : ""}`) +
+            p("O rastreio começa a mostrar as movimentações assim que os Correios registrarem o pacote — pode levar algumas horas.") +
             (t?.code
               ? `<div style="margin:20px 0 4px;padding:18px;border-radius:14px;background:${C.lilacSoft};text-align:center">
                   <div style="font-size:12px;letter-spacing:2px;color:${C.muted}">CÓDIGO DE RASTREIO</div>
