@@ -30,6 +30,10 @@ export async function GET(req: NextRequest, ctx: RouteContext<"/api/cron/[job]">
   const { job } = await ctx.params;
   const db = createAdminClient();
 
+  // Mantém o projeto Supabase (plano grátis) ativo: toda execução agendada
+  // acessa o banco, mesmo que a tarefa em si não tenha nada a fazer.
+  await db.from("store_settings").select("id", { head: true, count: "exact" }).eq("id", 1);
+
   if (job === "expire-orders") {
     if (!isMercadoPagoConfigured()) return Response.json({ ok: true, skipped: "mercadopago_not_configured" });
     const cutoff = new Date(Date.now() - 60 * 60 * 1000).toISOString();

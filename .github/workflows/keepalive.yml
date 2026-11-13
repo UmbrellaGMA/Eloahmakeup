@@ -1,0 +1,34 @@
+# Mantém a loja e o banco (Supabase grátis) sempre ativos.
+# O Supabase pausa projetos grátis após 7 dias sem acesso; este agendamento
+# acessa o banco a cada 6 horas pelo endereço /api/health do site.
+# Opcional: com o segredo CRON_SECRET cadastrado no GitHub (Settings → Secrets
+# and variables → Actions), também cancela Pix não pagos a cada 6 horas.
+name: Manter loja ativa
+
+on:
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verificar site e banco
+        run: |
+          for i in 1 2 3; do
+            if curl -fsS --max-time 30 https://eloahmakeup.com/api/health; then echo; exit 0; fi
+            echo "tentativa $i falhou, aguardando..."; sleep 20
+          done
+          echo "::error::Site ou banco indisponível"; exit 1
+
+      - name: Cancelar Pix vencidos (opcional)
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$CRON_SECRET" ]; then echo "CRON_SECRET não cadastrado no GitHub — etapa ignorada"; exit 0; fi
+          curl -fsS --max-time 60 -H "Authorization: Bearer $CRON_SECRET" https://eloahmakeup.com/api/cron/expire-orders; echo
