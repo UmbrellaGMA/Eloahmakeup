@@ -36,7 +36,6 @@ export default async function HomePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
       <HeroCarousel banners={banners} />
       <Benefits settings={settings} />
-      <CategoryShowcase categories={categories} />
 
       <ProductRail eyebrow="Acabou de chegar" title="Novidades" products={newest.items} href="/produtos?lancamentos=1" />
       <ProductRail eyebrow="Seleção Eloah" title="Destaques da semana" products={featured.items} href="/produtos" />
@@ -66,6 +65,7 @@ export default async function HomePage() {
 
       <Testimonials items={settings.testimonials} />
       <InstagramSection url={settings.instagram_url} posts={settings.instagram_posts} />
+      <CategoryShowcase categories={categories} />
       <Newsletter />
     </>
   );

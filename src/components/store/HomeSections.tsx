@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight, BadgePercent, CreditCard, Flame, Gem, Quote, ShieldCheck, Sparkles, Star, Truck } from "lucide-react";
+import { ArrowUpRight, CreditCard, Quote, ShieldCheck, Star, Truck } from "lucide-react";
 import type { Category, InstagramPost, StoreSettings, Testimonial } from "@/lib/types";
 import { InstagramIcon, PixIcon } from "@/components/ui/SocialIcons";
 import { formatPrice } from "@/lib/format";
@@ -35,18 +35,17 @@ export function Benefits({ settings }: { settings: StoreSettings }) {
 export function CategoryShowcase({ categories }: { categories: Category[] }) {
   const roots = categories.filter((c) => !c.parent_id).slice(0, 2);
   const tiles = [
-    ...roots.map((c, i) => ({
+    ...roots.map((c) => ({
       key: c.id,
       title: c.name,
       text: c.description ?? "",
       href: `/categoria/${c.slug}`,
       image: c.image_url,
-      Icon: i === 0 ? Sparkles : Gem,
       big: true,
     })),
-    { key: "new", title: "Lançamentos", text: "As novidades que acabaram de chegar", href: "/produtos?lancamentos=1", image: null, Icon: Star, big: false },
-    { key: "best", title: "Mais vendidos", text: "As favoritas das nossas clientes", href: "/produtos?ordem=mais-vendidos", image: null, Icon: Flame, big: false },
-    { key: "sale", title: "Ofertas", text: "Preços especiais por tempo limitado", href: "/produtos?promocao=1", image: null, Icon: BadgePercent, big: false },
+    { key: "new", title: "Lançamentos", text: "As novidades que acabaram de chegar", href: "/produtos?lancamentos=1", image: null, big: false },
+    { key: "best", title: "Mais vendidos", text: "As favoritas das nossas clientes", href: "/produtos?ordem=mais-vendidos", image: null, big: false },
+    { key: "sale", title: "Ofertas", text: "Preços especiais por tempo limitado", href: "/produtos?promocao=1", image: null, big: false },
   ];
   return (
     <section className="container-page py-14 sm:py-20">
@@ -55,22 +54,16 @@ export function CategoryShowcase({ categories }: { categories: Category[] }) {
         <h2 className="heading-display mt-2 text-3xl sm:text-[2.6rem]">Categorias em destaque</h2>
       </div>
       <div className="grid gap-4 sm:gap-5 md:grid-cols-6">
-        {tiles.map(({ key, title, text, href, image, Icon, big }, i) => (
+        {tiles.map(({ key, title, text, href, image, big }, i) => (
           <Link
             key={key}
             href={href}
-            className={`group relative flex overflow-hidden rounded-[var(--radius-card)] ${big ? "min-h-[260px] md:col-span-3 md:min-h-[340px]" : "min-h-[170px] md:col-span-2"} ${
+            className={`group relative flex overflow-hidden rounded-[var(--radius-card)] ${big ? "min-h-[200px] md:col-span-3 md:min-h-[260px]" : "min-h-[150px] md:col-span-2"} ${
               i === 0 ? "bg-ink text-white" : i === 1 ? "bg-lilac-100" : "bg-cream"
             }`}
           >
             {image && <Image src={image} alt={title} fill sizes="(max-width:768px) 100vw, 50vw" className="object-cover transition duration-700 group-hover:scale-105" />}
             {image && <div className="absolute inset-0 bg-gradient-to-t from-ink/70 to-transparent" />}
-            {!image && (
-              <Icon
-                className={`absolute -bottom-6 -right-6 transition duration-700 group-hover:rotate-12 group-hover:scale-110 ${big ? "h-48 w-48" : "h-28 w-28"} ${i === 0 ? "text-lilac-500/30" : "text-lilac-300/50"}`}
-                strokeWidth={1}
-              />
-            )}
             <div className={`relative mt-auto p-6 sm:p-8 ${image ? "text-white" : ""}`}>
               <h3 className={`heading-display ${big ? "text-4xl" : "text-2xl"} ${i === 0 || image ? "!text-white" : ""}`}>{title}</h3>
               {text && <p className={`mt-1.5 max-w-xs text-sm ${i === 0 || image ? "text-white/70" : "text-ink-muted"}`}>{text}</p>}
