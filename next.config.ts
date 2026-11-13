@@ -40,6 +40,16 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
+  async redirects() {
+    // Endereço único para SEO: www e o endereço provisório da Vercel → eloahmakeup.com
+    return ["www.eloahmakeup.com", "eloahmakeup.vercel.app"].map((host) => ({
+      // /api fica de fora: webhooks (POST) não seguem redirecionamentos
+      source: "/:path((?!api/).*)",
+      has: [{ type: "host" as const, value: host }],
+      destination: "https://eloahmakeup.com/:path*",
+      permanent: true,
+    }));
+  },
 };
 
 export default nextConfig;
