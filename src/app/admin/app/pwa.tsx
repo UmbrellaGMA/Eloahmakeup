@@ -119,6 +119,14 @@ export function PushSettings({ events, initialPrefs }: { events: Record<string, 
 
   if (!env) return <div className="skeleton h-40" />;
 
+  const diag = (
+    <p className="mt-6 border-t border-line pt-3 text-[11px] text-ink-muted">
+      Diagnóstico: {env.ios ? "iPhone/iPad" : "outro aparelho"} · aberto pelo app instalado: {env.standalone ? "sim" : "não"} · suporte a push:{" "}
+      {env.supported ? "sim" : "não"} · permissão: {permission === "granted" ? "permitida" : permission === "denied" ? "bloqueada" : permission === "unsupported" ? "indisponível" : "ainda não pedida"} · inscrito:{" "}
+      {subscription ? "sim" : "não"}
+    </p>
+  );
+
   // iPhone fora do app instalado: só é possível ativar push depois de adicionar à Tela de Início
   if (env.ios && !env.standalone) {
     return (
@@ -129,12 +137,19 @@ export function PushSettings({ events, initialPrefs }: { events: Record<string, 
           <li className="flex items-start gap-3"><span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-ink text-xs font-bold text-white">2</span><span>Role e toque em <SquarePlus className="mx-0.5 inline h-4 w-4" /> <strong>Adicionar à Tela de Início</strong> e depois em <strong>Adicionar</strong>.</span></li>
           <li className="flex items-start gap-3"><span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-ink text-xs font-bold text-white">3</span><span>Abra o app <strong>Eloah Admin</strong> pela Tela de Início, entre com seu e-mail e senha, venha até esta página e toque em <strong>Ativar notificações</strong>.</span></li>
         </ol>
+        <p className="rounded-xl bg-amber-50 p-3 text-xs text-amber-900">Você está vendo estas instruções porque esta página foi aberta pelo Safari. Dentro do app instalado aparece o botão <strong>Ativar notificações</strong>.</p>
+        {diag}
       </div>
     );
   }
 
   if (!env.supported || !VAPID) {
-    return <p className="text-sm text-ink-muted">Este navegador não suporta notificações push. No iPhone, use o Safari e instale o app na Tela de Início.</p>;
+    return (
+      <div>
+        <p className="text-sm text-ink-muted">Este navegador não suporta notificações push. No iPhone, use o Safari e instale o app na Tela de Início (iOS 16.4 ou mais recente — confira em Ajustes → Geral → Sobre).</p>
+        {diag}
+      </div>
+    );
   }
 
   return (
@@ -177,6 +192,7 @@ export function PushSettings({ events, initialPrefs }: { events: Record<string, 
           <Smartphone className="mt-0.5 h-4 w-4 shrink-0" /> Para receber no iPhone, abra este endereço no Safari do celular e adicione à Tela de Início. As notificações deste computador continuam funcionando separadamente.
         </p>
       )}
+      {diag}
     </div>
   );
 }

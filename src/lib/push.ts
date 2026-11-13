@@ -35,17 +35,16 @@ function setup() {
 
 /** Envia para os aparelhos inscritos (opcionalmente filtrando por tipo de aviso). */
 export async function sendPush(payload: PushPayload, opts: { event?: PushEvent; subscriptionIds?: string[] } = {}) {
-  if (!setup()) return { sent: 0, failed: 0 };
+  if (!setup()) return { sent: 0, failed: 0, targets: 0 };
   const db = createAdminClient();
   let q = db.from("push_subscriptions").select("id, endpoint, p256dh, auth, preferences, failures");
   if (opts.subscriptionIds?.length) q = q.in("id", opts.subscriptionIds);
   const { data: subs } = await q;
   let sent = 0;
   let failed = 0;
+  const targets = (subs ?? []).filter((s) => !opts.event || (s.preferences as Record<string, boolean>)?.[opts.event] !== false);
   await Promise.all(
-    (subs ?? [])
-      .filter((s) => !opts.event || (s.preferences as Record<string, boolean>)?.[opts.event] !== false)
-      .map(async (s) => {
+    targets.map(async (s) => {
         try {
           await webpush.sendNotification(
             { endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } },
@@ -63,7 +62,7 @@ export async function sendPush(payload: PushPayload, opts: { event?: PushEvent; 
         }
       }),
   );
-  return { sent, failed };
+  return { sent, failed, targets: targets.length };
 }
 
 const EVENT_FOR_KIND: Partial<Record<EmailKind, PushEvent>> = {
@@ -113,10 +112,14 @@ export async function notifyAdminsPush(orderId: string, kind: EmailKind) {
     if (claim.error) return; // já enviado (ou em envio) para este pedido/evento
     const { data: order } = await db.from("orders").select("*").eq("id", orderId).maybeSingle();
     if (!order) return;
-    const { sent, failed } = await sendPush(message(event, order as Order), { event });
+    const { sent, failed, targets } = await sendPush(message(event, order as Order), { event });
     await db
       .from("notifications")
-      .update({ status: sent > 0 || failed === 0 ? "sent" : "failed", sent_at: new Date().toISOString(), error: failed ? `${failed} aparelho(s) falharam` : null })
+      .update({
+        status: sent > 0 ? "sent" : "failed",
+        sent_at: sent > 0 ? new Date().toISOString() : null,
+        error: targets === 0 ? "Nenhum aparelho com notificações ativas" : failed ? `${failed} aparelho(s) falharam` : null,
+      })
       .eq("id", claim.data.id);
   } catch (e) {
     console.error("[push]", e);

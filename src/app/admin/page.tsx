@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { AlertTriangle, CheckCircle2 } from "lucide-react";
+import { AlertTriangle, Bell, CheckCircle2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { formatDate, formatPrice, orderStatusLabel, orderStatusTone, paymentStatusLabel, paymentStatusTone } from "@/lib/format";
 import { integrations } from "@/lib/server-env";
@@ -37,7 +37,7 @@ function Stat({ label, value, hint, href }: { label: string; value: string | num
 
 export default async function AdminDashboard() {
   const supabase = await createClient();
-  const [{ data: stats, error }, { data: recent }, { data: lowStock }] = await Promise.all([
+  const [{ data: stats, error }, { data: recent }, { data: lowStock }, { count: devices }] = await Promise.all([
     supabase.rpc("admin_dashboard_stats", { p_days: 30 }),
     supabase.from("orders").select("id, order_number, customer_name, total, status, payment_status, created_at").order("created_at", { ascending: false }).limit(8),
     supabase
@@ -47,6 +47,8 @@ export default async function AdminDashboard() {
       .lte("quantity", 5)
       .order("quantity")
       .limit(8),
+    // RLS: retorna somente os aparelhos do próprio administrador
+    supabase.from("push_subscriptions").select("id", { count: "exact", head: true }),
   ]);
   const s = (stats ?? {}) as Stats;
 
@@ -73,6 +75,15 @@ export default async function AdminDashboard() {
             <Link href="/admin/integracoes" className="font-semibold underline">Ver integrações</Link>
           </p>
         </div>
+      )}
+
+      {integrations.push && !devices && (
+        <Link href="/admin/app" className="mb-6 flex items-center gap-3 rounded-2xl border border-lilac-200 bg-lilac-50 p-4 text-sm text-lilac-900 transition hover:border-lilac-400">
+          <Bell className="h-5 w-5 shrink-0" />
+          <span>
+            <strong>Nenhum celular recebendo avisos de pedidos.</strong> Instale o app Eloah Admin no iPhone e ative as notificações →
+          </span>
+        </Link>
       )}
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
