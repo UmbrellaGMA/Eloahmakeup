@@ -3,6 +3,7 @@ import webpush from "web-push";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { serverEnv, integrations } from "@/lib/server-env";
 import { formatPrice } from "@/lib/format";
+import { logIntegration } from "@/lib/logger";
 import type { EmailKind } from "@/lib/email/templates";
 import type { Order } from "@/lib/types";
 
@@ -49,13 +50,16 @@ export async function sendPush(payload: PushPayload, opts: { event?: PushEvent; 
           await webpush.sendNotification(
             { endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } },
             JSON.stringify(payload),
-            { TTL: 60 * 60 * 24, urgency: "high", topic: payload.tag?.slice(0, 32).replace(/[^A-Za-z0-9_-]/g, "") || undefined },
+            // Sem "topic": o servidor da Apple recusa (BadWebPushTopic)
+            { TTL: 60 * 60 * 24, urgency: "high" },
           );
           sent++;
           await db.from("push_subscriptions").update({ last_used_at: new Date().toISOString(), failures: 0 }).eq("id", s.id);
         } catch (e) {
           failed++;
           const status = (e as { statusCode?: number }).statusCode;
+          const reason = String((e as { body?: string }).body ?? (e as Error).message ?? "").slice(0, 300);
+          await logIntegration({ provider: "system", operation: "push", level: "warn", message: `Push recusado (${status ?? "?"}) para ${new URL(s.endpoint).host}: ${reason}` });
           // 404/410: o aparelho removeu o app ou revogou a permissão
           if (status === 404 || status === 410 || s.failures >= 5) await db.from("push_subscriptions").delete().eq("id", s.id);
           else await db.from("push_subscriptions").update({ failures: s.failures + 1 }).eq("id", s.id);
