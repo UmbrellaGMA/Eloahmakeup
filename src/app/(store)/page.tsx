@@ -6,8 +6,13 @@ import { ButtonLink } from "@/components/ui/Button";
 import { getActiveBanners, getCategories, getStoreSettings, listProducts } from "@/lib/catalog";
 import { publicEnv } from "@/lib/env";
 import { jsonLd as toJsonLd } from "@/lib/safe";
+import type { Metadata } from "next";
 
 export const revalidate = 120;
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 export default async function HomePage() {
   const [banners, categories, settings, featured, newest, best, sale] = await Promise.all([
@@ -23,18 +28,57 @@ export default async function HomePage() {
   const catalogEmpty = !featured.total && !newest.total && !best.total && !sale.total;
   const fallback = catalogEmpty ? null : await listProducts({ perPage: 12, sort: "novidades" });
 
+  const site = publicEnv.siteUrl;
   const orgJsonLd = {
     "@context": "https://schema.org",
-    "@type": "Organization",
-    name: settings.store_name,
-    url: publicEnv.siteUrl,
-    logo: `${publicEnv.siteUrl}/icon.svg`,
-    sameAs: [settings.instagram_url, settings.facebook_url, settings.tiktok_url].filter(Boolean),
+    "@graph": [
+      {
+        "@type": ["Organization", "OnlineStore"],
+        "@id": `${site}/#organizacao`,
+        name: settings.store_name,
+        ...(settings.company_name ? { legalName: settings.company_name } : {}),
+        ...(settings.cnpj ? { taxID: settings.cnpj } : {}),
+        url: site,
+        // O Google exige logo em imagem raster (PNG/JPG), não SVG
+        logo: { "@type": "ImageObject", url: `${site}/brand/app/icon-512.png`, width: 512, height: 512 },
+        image: `${site}/opengraph-image.png`,
+        description: settings.tagline ?? "Maquiagens e acessórios de beleza com curadoria Eloah Make Up.",
+        ...(settings.email ? { email: settings.email } : {}),
+        ...(settings.whatsapp || settings.email
+          ? {
+              contactPoint: {
+                "@type": "ContactPoint",
+                contactType: "customer service",
+                areaServed: "BR",
+                availableLanguage: "Portuguese",
+                ...(settings.whatsapp ? { telephone: `+55${settings.whatsapp.replace(/\D/g, "")}` } : {}),
+                ...(settings.email ? { email: settings.email } : {}),
+              },
+            }
+          : {}),
+        sameAs: [settings.instagram_url, settings.facebook_url, settings.tiktok_url].filter(Boolean),
+      },
+      {
+        "@type": "WebSite",
+        "@id": `${site}/#site`,
+        url: site,
+        name: settings.store_name,
+        inLanguage: "pt-BR",
+        publisher: { "@id": `${site}/#organizacao` },
+        potentialAction: {
+          "@type": "SearchAction",
+          target: { "@type": "EntryPoint", urlTemplate: `${site}/produtos?q={search_term_string}` },
+          "query-input": "required name=search_term_string",
+        },
+      },
+    ],
   };
 
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: toJsonLd(orgJsonLd) }} />
+      {/* Título principal da página (lido pelo Google e por leitores de tela) */}
+      <h1 className="sr-only">Eloah Make Up — maquiagens e acessórios de beleza com entrega para todo o Brasil</h1>
       <HeroCarousel banners={banners} />
       <Benefits settings={settings} />
 

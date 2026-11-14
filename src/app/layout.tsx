@@ -24,18 +24,34 @@ export const metadata: Metadata = {
     template: "%s | Eloah Make Up",
   },
   description:
-    "Maquiagens e acessórios de beleza com curadoria Eloah Make Up. Pague com Pix ou cartão em até 6x e receba em todo o Brasil.",
+    "Loja online de maquiagens e acessórios de beleza: bases, batons, paletas de sombras, pincéis, esponjas e necessaires. Pague com Pix ou em até 6x no cartão e receba em todo o Brasil.",
   applicationName: "Eloah Make Up",
-  keywords: ["maquiagem", "make up", "batom", "base", "pincéis", "acessórios de beleza", "Eloah Make Up"],
+  keywords: [
+    "Eloah Make Up",
+    "maquiagem",
+    "loja de maquiagem online",
+    "make up",
+    "batom",
+    "base líquida",
+    "paleta de sombras",
+    "pincéis de maquiagem",
+    "esponja de maquiagem",
+    "acessórios de beleza",
+  ],
+  category: "beauty",
+  formatDetection: { telephone: false, address: false, email: false },
   openGraph: {
     type: "website",
     locale: "pt_BR",
     siteName: "Eloah Make Up",
+    url: "/",
     title: "Eloah Make Up — Maquiagens e acessórios",
-    description: "Maquiagens e acessórios de beleza com curadoria Eloah Make Up.",
+    description: "Maquiagens e acessórios de beleza com curadoria Eloah Make Up. Pix ou até 6x no cartão, entrega em todo o Brasil.",
   },
-  twitter: { card: "summary_large_image" },
-  robots: { index: true, follow: true },
+  twitter: { card: "summary_large_image", title: "Eloah Make Up — Maquiagens e acessórios" },
+  robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 } },
+  // Google Search Console: defina GOOGLE_SITE_VERIFICATION na Vercel com o código fornecido pelo Google
+  ...(process.env.GOOGLE_SITE_VERIFICATION ? { verification: { google: process.env.GOOGLE_SITE_VERIFICATION } } : {}),
 };
 
 export const viewport: Viewport = {

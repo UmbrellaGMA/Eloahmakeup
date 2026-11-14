@@ -239,9 +239,16 @@ export async function getRelatedProducts(product: ProductWithRelations, limit = 
 }
 
 export async function getAllProductSlugs() {
-  return safe<{ slug: string; updated_at: string }[]>([], async () => {
-    const { data, error } = await createPublicClient().from("products").select("slug, updated_at").eq("status", "active");
+  return safe<{ slug: string; updated_at: string; images: string[] }[]>([], async () => {
+    const { data, error } = await createPublicClient()
+      .from("products")
+      .select("slug, updated_at, images:product_images(url, position)")
+      .eq("status", "active");
     if (error) throw error;
-    return data ?? [];
+    return (data ?? []).map((p) => ({
+      slug: p.slug as string,
+      updated_at: p.updated_at as string,
+      images: [...((p.images as { url: string; position: number }[]) ?? [])].sort((a, b) => a.position - b.position).map((i) => i.url),
+    }));
   });
 }

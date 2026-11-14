@@ -14,7 +14,7 @@ type Page = { title: string; description: string; body: (s: StoreSettings) => st
 const PAGES: Record<string, Page> = {
   sobre: {
     title: "Sobre a Eloah Make Up",
-    description: "Conheça a Eloah Make Up.",
+    description: "Conheça a Eloah Make Up: maquiagens e acessórios escolhidos a dedo, pagamento seguro pelo Mercado Pago e envio para todo o Brasil.",
     body: (s) => [
       `A ${s.store_name} nasceu da paixão por maquiagem e pelo poder que ela tem de revelar a melhor versão de cada mulher.`,
       "Selecionamos maquiagens e acessórios com atenção à qualidade, ao acabamento e à experiência de uso — para que a sua rotina de beleza seja prática, segura e cheia de personalidade.",
@@ -23,7 +23,7 @@ const PAGES: Record<string, Page> = {
   },
   "trocas-e-devolucoes": {
     title: "Trocas e devoluções",
-    description: "Política de trocas e devoluções.",
+    description: "Política de trocas e devoluções da Eloah Make Up: direito de arrependimento em 7 dias, produtos com defeito e como solicitar o reembolso.",
     body: (s) => [
       "## Direito de arrependimento",
       "Compras feitas pela internet podem ser canceladas em até 7 (sete) dias corridos a partir do recebimento, conforme o art. 49 do Código de Defesa do Consumidor. O produto deve ser devolvido sem uso e na embalagem original, com lacre intacto.",
@@ -38,7 +38,7 @@ const PAGES: Record<string, Page> = {
   },
   "politica-de-privacidade": {
     title: "Política de privacidade",
-    description: "Como tratamos seus dados pessoais.",
+    description: "Política de privacidade da Eloah Make Up: quais dados coletamos, para que usamos e como exercer seus direitos pela LGPD.",
     body: (s) => [
       `Esta política descreve como a ${s.company_name || s.store_name} trata os dados pessoais de clientes, em conformidade com a Lei Geral de Proteção de Dados (Lei 13.709/2018).`,
       "## Dados coletados",
@@ -53,7 +53,7 @@ const PAGES: Record<string, Page> = {
   },
   "termos-de-uso": {
     title: "Termos de uso",
-    description: "Condições de uso da loja.",
+    description: "Termos de uso da Eloah Make Up: pedidos, preços, formas de pagamento (Pix e cartão) e entrega.",
     body: (s) => [
       `Ao utilizar a loja ${s.store_name}, você concorda com estes termos.`,
       "## Pedidos e preços",

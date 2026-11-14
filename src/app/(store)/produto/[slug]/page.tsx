@@ -21,11 +21,19 @@ export async function generateMetadata({ params }: PageProps<"/produto/[slug]">)
     alternates: { canonical: `/produto/${p.slug}` },
     openGraph: {
       type: "website",
+      siteName: "Eloah Make Up",
+      locale: "pt_BR",
+      url: `/produto/${p.slug}`,
       title: p.seo_title ?? p.name,
       description,
       images: p.images.slice(0, 4).map((i) => ({ url: i.url, alt: i.alt ?? p.name })),
     },
   };
+}
+
+/** Validade informada ao Google para o preço (a página é revalidada a cada 2 minutos). */
+function priceValidUntil() {
+  return new Date(Date.now() + 365 * 864e5).toISOString().slice(0, 10);
 }
 
 export default async function ProductPage({ params }: PageProps<"/produto/[slug]">) {
@@ -41,23 +49,59 @@ export default async function ProductPage({ params }: PageProps<"/produto/[slug]
     .filter((i) => (product.has_variants ? i.variant_id !== null : i.variant_id === null))
     .reduce((s, i) => s + i.quantity, 0);
 
+  const url = `${publicEnv.siteUrl}/produto/${product.slug}`;
+  const nextYear = priceValidUntil();
+  const activeVariants = product.variants.filter((v) => v.is_active);
+  const variantPrices = activeVariants.map((v) => effectivePrice(product, v).final);
+  const shippingDetails = {
+    "@type": "OfferShippingDetails",
+    shippingDestination: { "@type": "DefinedRegion", addressCountry: "BR" },
+    deliveryTime: {
+      "@type": "ShippingDeliveryTime",
+      handlingTime: { "@type": "QuantitativeValue", minValue: 1, maxValue: 3, unitCode: "DAY" },
+      transitTime: { "@type": "QuantitativeValue", minValue: 1, maxValue: 15, unitCode: "DAY" },
+    },
+  };
+  const returnPolicy = {
+    "@type": "MerchantReturnPolicy",
+    applicableCountry: "BR",
+    returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
+    merchantReturnDays: 7,
+    returnMethod: "https://schema.org/ReturnByMail",
+    merchantReturnLink: `${publicEnv.siteUrl}/institucional/trocas-e-devolucoes`,
+  };
+  const baseOffer = {
+    url,
+    priceCurrency: "BRL",
+    priceValidUntil: nextYear,
+    availability: totalStock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+    itemCondition: "https://schema.org/NewCondition",
+    seller: { "@type": "Organization", name: "Eloah Make Up", url: publicEnv.siteUrl },
+    shippingDetails,
+    hasMerchantReturnPolicy: returnPolicy,
+  };
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
+    "@id": `${url}#produto`,
+    url,
     name: product.name,
     sku: product.sku,
-    description: product.short_description ?? product.description ?? undefined,
+    description: product.seo_description ?? product.short_description ?? product.description ?? undefined,
     image: product.images.map((i) => i.url),
     brand: { "@type": "Brand", name: product.brand ?? "Eloah Make Up" },
     category: cat?.name,
-    offers: {
-      "@type": "Offer",
-      url: `${publicEnv.siteUrl}/produto/${product.slug}`,
-      priceCurrency: "BRL",
-      price: prices.final.toFixed(2),
-      availability: totalStock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-      itemCondition: "https://schema.org/NewCondition",
-    },
+    ...(product.weight_grams ? { weight: { "@type": "QuantitativeValue", value: product.weight_grams, unitCode: "GRM" } } : {}),
+    offers:
+      variantPrices.length > 1 && Math.min(...variantPrices) !== Math.max(...variantPrices)
+        ? {
+            "@type": "AggregateOffer",
+            ...baseOffer,
+            lowPrice: Math.min(...variantPrices).toFixed(2),
+            highPrice: Math.max(...variantPrices).toFixed(2),
+            offerCount: variantPrices.length,
+          }
+        : { "@type": "Offer", ...baseOffer, price: prices.final.toFixed(2) },
   };
 
   return (
