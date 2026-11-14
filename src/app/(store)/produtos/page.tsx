@@ -16,7 +16,7 @@ export async function generateMetadata({ searchParams }: PageProps<"/produtos">)
     description,
     alternates: { canonical: seo.canonical },
     robots: seo.index && !q ? { index: true, follow: true } : { index: false, follow: true },
-    openGraph: { title: `${title} | Eloah Make Up`, description, url: seo.canonical, type: "website", siteName: "Eloah Make Up", locale: "pt_BR" },
+    openGraph: { title: `${title} | Eloah Make Up`, description, url: seo.canonical, type: "website", siteName: "Eloah Make Up", locale: "pt_BR", images: [{ url: "/opengraph-image.png", width: 1200, height: 630, alt: "Eloah Make Up — maquiagens e acessórios" }] },
   };
 }
 

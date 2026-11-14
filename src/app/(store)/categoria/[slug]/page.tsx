@@ -25,7 +25,7 @@ export async function generateMetadata({ params, searchParams }: PageProps<"/cat
       type: "website",
       siteName: "Eloah Make Up",
       locale: "pt_BR",
-      ...(cat.image_url ? { images: [cat.image_url] } : {}),
+      images: cat.image_url ? [cat.image_url] : [{ url: "/opengraph-image.png", width: 1200, height: 630, alt: "Eloah Make Up — maquiagens e acessórios" }],
     },
   };
 }
