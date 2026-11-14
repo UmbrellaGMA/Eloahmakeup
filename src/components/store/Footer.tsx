@@ -90,7 +90,12 @@ export function Footer({ settings, categories }: { settings: StoreSettings; cate
             © {new Date().getFullYear()} {settings.company_name || settings.store_name}
             {settings.cnpj ? ` · CNPJ ${settings.cnpj}` : ""}. Todos os direitos reservados.
           </p>
-          <p>Envios por SuperFrete · Pagamentos por Mercado Pago</p>
+          <p>
+            Desenvolvido por{" "}
+            <a href="https://www.orionstudio013.online/" target="_blank" rel="noopener" className="font-semibold text-ink underline-offset-2 hover:text-lilac-700 hover:underline">
+              Gustavo Melo
+            </a>
+          </p>
         </div>
       </div>
     </footer>
